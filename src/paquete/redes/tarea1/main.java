@@ -5,11 +5,9 @@ public class main {
 
 	public static void main(String[] args){
 		
+		//inicia el servidor
 		Servidor servidor = new Servidor();
-		//Cliente cliente = new Cliente();
 		servidor.iniciar_servidor();
-		//cliente.iniciar_cliente();
-		
 		
 	}
 }

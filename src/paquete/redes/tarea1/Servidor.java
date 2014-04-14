@@ -22,43 +22,28 @@ public class Servidor {
 				
 			System.out.println("Espera cliente:");
 			//Iniciamos el socket... Espera al cliente
-			socket = S_socket.accept();
+			
+			while(true){
 				
-			// CLIENTE SE CONECTA //
-			System.out.println("Cliente conectado.");
-			//Crea los canales de entrada y salida			 
-			entrada = new DataInputStream(socket.getInputStream());
-			salida = new DataOutputStream(socket.getOutputStream());
-			System.out.println("Conexion confirmada!");
-			
-			//envia mensaje a cliente
-			//salida.writeUTF("Conexion exitosa!");
-			
-			//Recepcion de mensaje		 
-			mensajeRecibido = entrada.readUTF();
-			//System.out.println(mensajeRecibido);
-			//mensajeRecibido = entrada.readUTF();
-			//agregar_contacto(mensajeRecibido);
-			//mensajeRecibido = entrada.readUTF();
-			//agregar_contacto(mensajeRecibido);
-			//mensajeRecibido = entrada.readUTF();
-			//agregar_contacto(mensajeRecibido);
-			
-			
-			//String lista[] = new String[100];
-			//lista = cargar_contactos();
-			
-			//for(int i=0; lista[i]!= null; i++){
-			//	System.out.println(i + " : " +lista[i]);
-			//}
-			
-			entrada.close();
-			salida.close();
-			//Cerramos la conexion con el cliente
-			socket.close();
-			
-			System.out.println("Cierre de conexion!!!");
+				socket = S_socket.accept();
 				
+				// CLIENTE SE CONECTA //
+				System.out.println("Cliente conectado.");
+				//Crea los canales de entrada y salida			 
+				entrada = new DataInputStream(socket.getInputStream());
+				salida = new DataOutputStream(socket.getOutputStream());
+				System.out.println("Conexion confirmada!");
+							
+				//Recepcion de mensaje		 
+				mensajeRecibido = entrada.readUTF();			
+						
+				entrada.close();
+				salida.close();
+				//Cerramos la conexion con el cliente
+				socket.close();
+			
+				System.out.println("Cierre de conexion!!!");
+			}
 		}catch(Exception e ){		 
 				System.out.println("Error: "+e.getMessage());
 		}		
