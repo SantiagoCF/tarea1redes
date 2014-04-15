@@ -17,7 +17,7 @@ public class Servidor {
 	private String metodo;
 	private String version;
 	private String mensaje;
-	private int puerto = 8009;
+	private int puerto = 8012;
 	byte[] buffer = new byte[1024];
 	private int bytes;
 	private FileInputStream archivo = null;
@@ -46,7 +46,9 @@ public class Servidor {
 				salida = new PrintWriter(socket.getOutputStream());
 				System.out.println("Conexion confirmada!");
 							
-				//Recepcion del metodo (get o post)		 
+				//Recepcion del metodo (get o post)	
+				//mensaje = entrada.toString();
+				//System.out.println("/////"+mensaje+"///////");
 				metodo = entrada.next();
 				System.out.println(metodo);
 				
@@ -57,6 +59,8 @@ public class Servidor {
 				//Recepcion de la version del protocolo
 				version = entrada.next();
 				System.out.println(version);
+				
+				//ESTO LO HICE SOLO PARA PROBAR QUE DATOS TENIA LA CABECERA DEL MENSAJE Q MANDABA EL BROWSER... SON 13 (lo probé en Chrome)
 				if(metodo.equals("POST")){
 					System.out.println("2"+entrada.next() + " " + entrada.next() + "\n3" + entrada.next() + " " + entrada.next());
 					System.out.println("4"+entrada.next() + " " + entrada.next() + "\n5" + entrada.next() + " " + entrada.next());
@@ -67,6 +71,19 @@ public class Servidor {
 					System.out.print(" " + entrada.next() + "\n11" + entrada.next() + " " + entrada.next() + "\n12" + entrada.next());
 					System.out.println(" " + entrada.next() + "\n13" + entrada.next() + " " + entrada.next());
 					
+					// HASTA AQUI IMRPIME TODOS LODA DATOS DE LA CABECERA
+					
+					//ACA SE QUEDA PEGADO
+					System.out.println("//DATOS//");
+					Calendar fecha = Calendar.getInstance();
+					
+					salida.println(version + " 200 OK");
+					
+					//el siguiente entrada.next(); devuelve los datos q ingresas al form de la siguiente forma 
+					//ej: nom=Pablo&dir=123&puer=111
+					System.out.println(entrada.next());
+					System.out.println("//DATOS//");
+
 				}
 
 				//si el archivo existe, envia los datos al cliente
