@@ -2,51 +2,101 @@ package paquete.redes.tarea1;
 
 import java.net.*;
 import java.io.*;
+import java.util.*;
+
+import javax.sound.sampled.Line;
 
 public class Servidor {
 
 	//variables de clase
 	private ServerSocket S_socket;
 	private Socket socket;
-	private DataInputStream entrada;
-	private DataOutputStream salida;
-	private String mensajeRecibido;
+	private Scanner entrada;
+	private PrintWriter salida;
+	private String objeto;
+	private String metodo;
+	private String version;
+	private String mensaje;
+	private int puerto = 8009;
+	byte[] buffer = new byte[1024];
+	private int bytes;
+	private FileInputStream archivo = null;
 		
-	//contructor
 	public void iniciar_servidor(){
 		
 		try{
 			//creamos el socket servidor en el puerto 4000
-			S_socket = new ServerSocket(4003);
+			S_socket = new ServerSocket(puerto);
 			socket = new Socket();
-				
-			System.out.println("Espera cliente:");
-			//Iniciamos el socket... Espera al cliente
-			
+	
 			while(true){
 				
+				//Iniciamos el socket... Espera al cliente
+				System.out.println("Espera cliente:");
 				socket = S_socket.accept();
 				
 				// CLIENTE SE CONECTA //
 				System.out.println("Cliente conectado.");
+				
+				//aseguramos que el fin de linea sea el correcto
+				System.setProperty("line.separator", "\r\n");
+				
 				//Crea los canales de entrada y salida			 
-				entrada = new DataInputStream(socket.getInputStream());
-				salida = new DataOutputStream(socket.getOutputStream());
+				entrada = new Scanner(socket.getInputStream());
+				salida = new PrintWriter(socket.getOutputStream());
 				System.out.println("Conexion confirmada!");
 							
-				//Recepcion de mensaje		 
-				mensajeRecibido = entrada.readUTF();			
-						
+				//Recepcion del metodo (get o post)		 
+				metodo = entrada.next();
+				System.out.println(metodo);
+				
+				//Recepcion del objeto 
+				objeto = "." + entrada.next();
+				System.out.println(objeto);
+				
+				//Recepcion de la version del protocolo
+				version = entrada.next();
+				System.out.println(version);
+				if(metodo.equals("POST")){
+					System.out.println("2"+entrada.next() + " " + entrada.next() + "\n3" + entrada.next() + " " + entrada.next());
+					System.out.println("4"+entrada.next() + " " + entrada.next() + "\n5" + entrada.next() + " " + entrada.next());
+					System.out.println("6"+entrada.next() + " " + entrada.next() + "\n7" + entrada.next() + " " + entrada.next());
+					System.out.print("8"+entrada.next() + " " + entrada.next() + "\n9" + entrada.next() + " " + entrada.next());
+					System.out.print(" "+entrada.next() + " " + entrada.next() + entrada.next() + " " + entrada.next());
+					System.out.print(" " + entrada.next() + " " + entrada.next() + entrada.next() + "\n10" + entrada.next());
+					System.out.print(" " + entrada.next() + "\n11" + entrada.next() + " " + entrada.next() + "\n12" + entrada.next());
+					System.out.println(" " + entrada.next() + "\n13" + entrada.next() + " " + entrada.next());
+					
+				}
+
+				//si el archivo existe, envia los datos al cliente
+				if((archivo = new FileInputStream(objeto)) != null){
+					System.out.println("Existe el objeto!!");
+					if(objeto.length() > 2){
+						while((bytes = archivo.read(buffer)) != -1){
+							socket.getOutputStream().write(buffer, 0, bytes);
+						}
+					}
+				}
+				// en caso contrario envia un error
+				else{
+					System.out.println("NO!!!Existe el objeto!!");
+					System.out.println("Error archivo\n");
+					salida.println(version + " 404 Not Found");
+					salida.println();
+				}
+				
+				//Cerramos la conexion con el cliente
 				entrada.close();
 				salida.close();
-				//Cerramos la conexion con el cliente
 				socket.close();
-			
+				archivo.close();
+				
 				System.out.println("Cierre de conexion!!!");
 			}
-		}catch(Exception e ){		 
-				System.out.println("Error: "+e.getMessage());
-		}		
+		}catch(Exception e){
+			System.out.println("Error:" + e.getMessage());
+		}
 	}
 	
 	public void agregar_contacto(String contacto){
@@ -87,7 +137,6 @@ public class Servidor {
 			archivo = new File("contactos.txt");
 			arch = new FileReader(archivo);
 			buffer = new BufferedReader(arch);
-			
 			
 			//Leemos el archivo
 			while((linea = buffer.readLine()) != null){
