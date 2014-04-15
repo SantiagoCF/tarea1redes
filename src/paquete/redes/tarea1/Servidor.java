@@ -1,4 +1,4 @@
-package paquete.redes.tarea1;
+package redes1;
 
 import java.net.*;
 import java.io.*;
@@ -17,7 +17,7 @@ public class Servidor {
 	private String metodo;
 	private String version;
 	private String mensaje;
-	private int puerto = 8012;
+	private int puerto = 8002;
 	byte[] buffer = new byte[1024];
 	private int bytes;
 	private FileInputStream archivo = null;
@@ -62,25 +62,45 @@ public class Servidor {
 				
 				//ESTO LO HICE SOLO PARA PROBAR QUE DATOS TENIA LA CABECERA DEL MENSAJE Q MANDABA EL BROWSER... SON 13 (lo probé en Chrome)
 				if(metodo.equals("POST")){
-					System.out.println("2"+entrada.next() + " " + entrada.next() + "\n3" + entrada.next() + " " + entrada.next());
+					/*System.out.println("2"+entrada.next() + " " + entrada.next() + "\n3" + entrada.next() + " " + entrada.next());
 					System.out.println("4"+entrada.next() + " " + entrada.next() + "\n5" + entrada.next() + " " + entrada.next());
 					System.out.println("6"+entrada.next() + " " + entrada.next() + "\n7" + entrada.next() + " " + entrada.next());
-					System.out.print("8"+entrada.next() + " " + entrada.next() + "\n9" + entrada.next() + " " + entrada.next());
+					System.out.print("8"+entrada.next() + " " + entrada.next() + entrada.next() + "\n9" + entrada.next() + " " + entrada.next());
 					System.out.print(" "+entrada.next() + " " + entrada.next() + entrada.next() + " " + entrada.next());
 					System.out.print(" " + entrada.next() + " " + entrada.next() + entrada.next() + "\n10" + entrada.next());
 					System.out.print(" " + entrada.next() + "\n11" + entrada.next() + " " + entrada.next() + "\n12" + entrada.next());
 					System.out.println(" " + entrada.next() + "\n13" + entrada.next() + " " + entrada.next());
+					*/
+					String nose = entrada.next();
+					int lenght; // servirá para leer byte por byte el contenido
 					
-					// HASTA AQUI IMRPIME TODOS LODA DATOS DE LA CABECERA
+					while((nose =entrada.next()) != null){
+						
+						System.out.println(nose);
+						if(nose.equals("Content-Length:")){
+							nose = entrada.next();
+							System.out.println(nose);
+							lenght = Integer.parseInt(nose);//guardamos cuantos bytes son
+						}
+						if(nose.equals("Accept-Language:")){
+							nose = entrada.next();
+							System.out.println(nose);
+							break;
+						}		
+					}
 					
+					
+					
+					//ACA DEBEMOS LEER POR BYTES
 					//ACA SE QUEDA PEGADO
 					System.out.println("//DATOS//");
-					Calendar fecha = Calendar.getInstance();
+					//Calendar fecha = Calendar.getInstance();
 					
 					salida.println(version + " 200 OK");
 					
 					//el siguiente entrada.next(); devuelve los datos q ingresas al form de la siguiente forma 
 					//ej: nom=Pablo&dir=123&puer=111
+					
 					System.out.println(entrada.next());
 					System.out.println("//DATOS//");
 
