@@ -1,4 +1,4 @@
-package redes1;
+package paquete.redes.tarea1;
 
 import java.net.*;
 import java.io.*;
@@ -18,10 +18,11 @@ public class Servidor {
 	private String metodo;
 	private String version;
 	private String datos_contacto;
-	private int puerto = 8000;
+	private int puerto = 8029;
 	byte[] buffer = new byte[1024];
 	private int bytes;
 	private FileInputStream archivo = null;
+	private Boolean existe_temporal = false;
 		
 	public void iniciar_servidor(){
 		
@@ -53,6 +54,7 @@ public class Servidor {
 				
 				//Recepcion del objeto 
 				objeto = "." + entrada.next();
+				System.out.println(objeto);
 				
 				//Recepcion de la version del protocolo
 				version = entrada.next();
@@ -108,37 +110,93 @@ public class Servidor {
 				
 				//si el metodo es GET 
 				else{
-					//si el archivo existe, envia los datos al cliente
-					if(objeto.equals(".\\ver_contacto") || objeto.equals("./ver_contacto")){
+					
+					//si el el html es "ver_contacto.html"
+					if(objeto.equals("./ver_contacto.html")){
+						
+						
+						//variables para la lectura del html "ver_contactos.html"
 						File original = null;
-						File nuevo = null;
-						FileReader originalReader = null;
-						FileWriter nuevoWriter = null;
+						FileReader arch_original = null;
+						BufferedReader buffer = null;
+						String linea = new String();
+						
+						//variables para escritura de html temporal
+						FileWriter temporal = null;
+						PrintWriter arch_temporal = null;
+						
+						//cargamos los contactos del archivo "contactos.txt"
+						String listaContactos[] = cargar_contactos();
+						
+						int i;
 						
 						try {
-							//abre archivos
-							nuevo = new File("temp.html");
-							original = new File("ver_contacto.html");
-							nuevoWriter = new FileWriter(nuevo);
-							originalReader= new FileReader(original);
+							System.out.println("Entra al try");
+							//abre el html para lectura
+							original = new File(objeto);
+							arch_original = new FileReader(original);
+							buffer = new BufferedReader(arch_original);
 							
-							//AQUI TODO EL WEBEO XDDDD
+							//crea el html temporal para escritura
+							temporal = new FileWriter("temporal.html", true);
+							arch_temporal = new PrintWriter(temporal);
 							
+							//Leemos el archivo y escribimos el html temporal con los datos cargados
+							while((linea = buffer.readLine()) != null){
+								
+								
+								//System.out.println(linea);
+								//copia la linea leida del html original								
+								arch_temporal.println(linea);
+								
+								//si "linea" es igual a "<tbody>", escribe los datos de los contactos
+								if(linea.equals("                        <tbody>")){
+									
+									int contactos = cantidad_contactos();
+									
+									for(i=0; i<contactos; i++){
+										
+										//System.out.println("Entra al for");
+
+										//variable para separar el string en 3 datos 
+										StringTokenizer dat_separados = new StringTokenizer(listaContactos[i]);
+										
+										arch_temporal.println("<tr>");
+										arch_temporal.print("<td>");
+										arch_temporal.print(i);
+										arch_temporal.println("</td>");
+										arch_temporal.print("<td>");
+										arch_temporal.print(dat_separados.nextToken());
+										arch_temporal.println("</td>");
+										arch_temporal.print("<td>");
+										arch_temporal.print(dat_separados.nextToken());
+										arch_temporal.println("</td>");
+										arch_temporal.print("<td>");
+										arch_temporal.print(dat_separados.nextToken());
+										arch_temporal.println("</td>");
+										arch_temporal.println("</tr>");
+										
+										//System.out.println(i+" "+dat_separados.nextToken()+" "+dat_separados.nextToken()+" "+dat_separados.nextToken());
+									}
+								}								
+							}
 							
-							originalReader.close();
-							nuevoWriter.close();
+							//cierra los archivos
+							arch_original.close();
+							arch_temporal.close();
 							
-							//esto es para renombrar los archivos
-							//original.delete();
-							//nuevo.renameTo(original);
-							
-							
+							//reemplazamos el valor de la variable "objeto" por el archivo "temporal.html"
+							objeto = "./temporal.html";
+							existe_temporal = true;
 							
 						} catch (IOException e) {
 							e.printStackTrace();
 						}
+						
 					}
-					else if((archivo = new FileInputStream(objeto)) != null){
+					
+					//si el archivo existe, envia los datos al cliente
+					if((archivo = new FileInputStream(objeto)) != null){
 						
 						if(objeto.length() > 2){
 							while((bytes = archivo.read(buffer)) != -1){
@@ -159,6 +217,13 @@ public class Servidor {
 					salida.close();
 					socket.close();
 					archivo.close();
+					
+					//si se creó un temporal, se elimina
+					if(existe_temporal){
+						
+						File temporal = new File("temporal.html"); 
+						temporal.delete(); 
+					}
 				}
 				System.out.println("Cierre de conexion!!!");
 			}
@@ -212,7 +277,6 @@ public class Servidor {
 			while((linea = buffer.readLine()) != null){
 				
 				listaContactos[i] = linea;
-				System.out.println(i);
 				i++;
 			}
 			//cierra el archivo
@@ -223,5 +287,35 @@ public class Servidor {
 		}
 		
 		return listaContactos;
+	}
+	
+	//retorna una lista con los datos de cada contacto agregado
+	public int cantidad_contactos(){
+			
+		File archivo = null;
+		FileReader arch = null;
+		BufferedReader buffer = null;
+		String linea = new String();
+		int contactos = 0;
+		
+		try {
+			
+			//abre el archivo para escritura
+			archivo = new File("contactos.txt");
+			arch = new FileReader(archivo);
+			buffer = new BufferedReader(arch);
+				
+			//Leemos el archivo
+			while((linea = buffer.readLine()) != null){
+				contactos++;
+			}
+			//cierra el archivo
+			arch.close();
+				
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+			
+		return contactos;
 	}
 }
