@@ -1,8 +1,9 @@
-package redes1;
+package paquete.redes.tarea1;
 
 import java.net.*;
 import java.io.*;
 import java.util.*;
+import java.util.regex.*;
 
 import javax.sound.sampled.Line;
 
@@ -16,8 +17,8 @@ public class Servidor {
 	private String objeto;
 	private String metodo;
 	private String version;
-	private String mensaje;
-	private int puerto = 8002;
+	private String datos_contacto;
+	private int puerto = 8013;
 	byte[] buffer = new byte[1024];
 	private int bytes;
 	private FileInputStream archivo = null;
@@ -47,88 +48,89 @@ public class Servidor {
 				System.out.println("Conexion confirmada!");
 							
 				//Recepcion del metodo (get o post)	
-				//mensaje = entrada.toString();
-				//System.out.println("/////"+mensaje+"///////");
 				metodo = entrada.next();
 				System.out.println(metodo);
 				
 				//Recepcion del objeto 
 				objeto = "." + entrada.next();
-				System.out.println(objeto);
 				
 				//Recepcion de la version del protocolo
 				version = entrada.next();
-				System.out.println(version);
 				
-				//ESTO LO HICE SOLO PARA PROBAR QUE DATOS TENIA LA CABECERA DEL MENSAJE Q MANDABA EL BROWSER... SON 13 (lo probé en Chrome)
+				// si el metodo de entrada es POST
 				if(metodo.equals("POST")){
-					/*System.out.println("2"+entrada.next() + " " + entrada.next() + "\n3" + entrada.next() + " " + entrada.next());
-					System.out.println("4"+entrada.next() + " " + entrada.next() + "\n5" + entrada.next() + " " + entrada.next());
-					System.out.println("6"+entrada.next() + " " + entrada.next() + "\n7" + entrada.next() + " " + entrada.next());
-					System.out.print("8"+entrada.next() + " " + entrada.next() + entrada.next() + "\n9" + entrada.next() + " " + entrada.next());
-					System.out.print(" "+entrada.next() + " " + entrada.next() + entrada.next() + " " + entrada.next());
-					System.out.print(" " + entrada.next() + " " + entrada.next() + entrada.next() + "\n10" + entrada.next());
-					System.out.print(" " + entrada.next() + "\n11" + entrada.next() + " " + entrada.next() + "\n12" + entrada.next());
-					System.out.println(" " + entrada.next() + "\n13" + entrada.next() + " " + entrada.next());
-					*/
-					String nose = entrada.next();
-					int lenght; // servirá para leer byte por byte el contenido
 					
-					while((nose =entrada.next()) != null){
+					//si el archivo existe, envia los datos al cliente
+					if((archivo = new FileInputStream(objeto)) != null){
 						
-						System.out.println(nose);
-						if(nose.equals("Content-Length:")){
-							nose = entrada.next();
-							System.out.println(nose);
-							lenght = Integer.parseInt(nose);//guardamos cuantos bytes son
-						}
-						if(nose.equals("Accept-Language:")){
-							nose = entrada.next();
-							System.out.println(nose);
-							break;
-						}		
-					}
-					
-					
-					
-					//ACA DEBEMOS LEER POR BYTES
-					//ACA SE QUEDA PEGADO
-					System.out.println("//DATOS//");
-					//Calendar fecha = Calendar.getInstance();
-					
-					salida.println(version + " 200 OK");
-					
-					//el siguiente entrada.next(); devuelve los datos q ingresas al form de la siguiente forma 
-					//ej: nom=Pablo&dir=123&puer=111
-					
-					System.out.println(entrada.next());
-					System.out.println("//DATOS//");
-
-				}
-
-				//si el archivo existe, envia los datos al cliente
-				if((archivo = new FileInputStream(objeto)) != null){
-					System.out.println("Existe el objeto!!");
-					if(objeto.length() > 2){
-						while((bytes = archivo.read(buffer)) != -1){
-							socket.getOutputStream().write(buffer, 0, bytes);
+						if(objeto.length() > 2){
+							while((bytes = archivo.read(buffer)) != -1){
+								socket.getOutputStream().write(buffer, 0, bytes);
+							}
 						}
 					}
+					
+					// en caso contrario envia un error
+					else{
+						System.out.println("Error archivo\n");
+						salida.println(version + " 404 Not Found");
+						salida.println();
+					}
+					
+					//cierra el socket
+					socket.close();
+					archivo.close();
+					
+					//expresion regular para buscar los datos del nuevo contacto
+					Boolean encontrado = false;
+					Pattern ER = Pattern.compile("^nom=");
+					while(!encontrado){
+						datos_contacto = entrada.next();
+						Matcher mat = ER.matcher(datos_contacto);
+						
+						//si encuentra la informacion del contacto, guarda solo los datos necesarios
+						if(mat.find()){
+							
+							encontrado = true;
+							
+							//quita del String los nombres de las variables y los "=" y "&", dejando solo los datos necesarios
+							datos_contacto = datos_contacto.replaceAll("\\bnom=\\b", "");
+							datos_contacto = datos_contacto.replaceAll("\\b&dir=\\b", " ");
+							datos_contacto = datos_contacto.replaceAll("\\b&puer=\\b", " ");
+							agregar_contacto(datos_contacto);
+						}
+
+					}		
+					
+					entrada.close();
+					salida.close();					
 				}
-				// en caso contrario envia un error
+				
+				//si el metodo es GET 
 				else{
-					System.out.println("NO!!!Existe el objeto!!");
-					System.out.println("Error archivo\n");
-					salida.println(version + " 404 Not Found");
-					salida.println();
+					//si el archivo existe, envia los datos al cliente
+					if((archivo = new FileInputStream(objeto)) != null){
+						
+						if(objeto.length() > 2){
+							while((bytes = archivo.read(buffer)) != -1){
+								socket.getOutputStream().write(buffer, 0, bytes);
+							}
+						}
+					}
+					
+					// en caso contrario envia un error
+					else{
+						System.out.println("Error archivo\n");
+						salida.println(version + " 404 Not Found");
+						salida.println();
+					}
+				
+					//Cerramos la conexion con el cliente
+					entrada.close();
+					salida.close();
+					socket.close();
+					archivo.close();
 				}
-				
-				//Cerramos la conexion con el cliente
-				entrada.close();
-				salida.close();
-				socket.close();
-				archivo.close();
-				
 				System.out.println("Cierre de conexion!!!");
 			}
 		}catch(Exception e){
@@ -152,6 +154,7 @@ public class Servidor {
 			
 			//cierra el archivo
 			arch.close();
+			System.out.println("contacto agregado exitosamente:\n" + contacto);
 			
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -159,13 +162,14 @@ public class Servidor {
 		
 	}
 	
+	//retorna una lista con los datos de cada contacto agregado
 	public String[] cargar_contactos(){
 		
 		File archivo = null;
 		FileReader arch = null;
 		BufferedReader buffer = null;
 		String linea = new String();
-		String listaContactos[] = new String[100];
+		String listaContactos[] = new String[200];
 		int i = 0;
 		
 		try {
@@ -188,6 +192,7 @@ public class Servidor {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
 		return listaContactos;
 	}
 }
