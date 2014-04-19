@@ -1,4 +1,4 @@
-package paquete.redes.tarea1;
+package redes1;
 
 import java.net.*;
 import java.io.*;
@@ -18,7 +18,7 @@ public class Servidor {
 	private String metodo;
 	private String version;
 	private String datos_contacto;
-	private int puerto = 8013;
+	private int puerto = 8000;
 	byte[] buffer = new byte[1024];
 	private int bytes;
 	private FileInputStream archivo = null;
@@ -109,7 +109,36 @@ public class Servidor {
 				//si el metodo es GET 
 				else{
 					//si el archivo existe, envia los datos al cliente
-					if((archivo = new FileInputStream(objeto)) != null){
+					if(objeto.equals(".\\ver_contacto") || objeto.equals("./ver_contacto")){
+						File original = null;
+						File nuevo = null;
+						FileReader originalReader = null;
+						FileWriter nuevoWriter = null;
+						
+						try {
+							//abre archivos
+							nuevo = new File("temp.html");
+							original = new File("ver_contacto.html");
+							nuevoWriter = new FileWriter(nuevo);
+							originalReader= new FileReader(original);
+							
+							//AQUI TODO EL WEBEO XDDDD
+							
+							
+							originalReader.close();
+							nuevoWriter.close();
+							
+							//esto es para renombrar los archivos
+							//original.delete();
+							//nuevo.renameTo(original);
+							
+							
+							
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					else if((archivo = new FileInputStream(objeto)) != null){
 						
 						if(objeto.length() > 2){
 							while((bytes = archivo.read(buffer)) != -1){
