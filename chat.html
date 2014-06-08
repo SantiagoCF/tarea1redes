@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<link rel="stylesheet" href="http://yui.yahooapis.com/pure/0.4.2/pure-min.css">
+		<link rel="stylesheet" type="text/css" href="style.css">
+	</head>
+
+	<div id="contenido" class="pure-g">
+        <div class="pure-u-1-3">
+            <form class="pure-form pure-form-stacked" method='GET' action='chat.html'>
+                <legend>MIS MENSAJES</legend>
+                <fieldset>
+                    <div class="pure-control-group">
+                        <textarea name="contenido" type="text" placeholder="Mensajes" cols="30\" rows="10"></textarea>
+                    </div>
+
+                    <div class="pure-controls">
+                        <button type="submit" class="pure-button pure-button-primary">Actualizar</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <div class="pure-u-1-3">
+            <form class="pure-form pure-form-stacked" method='POST' action=''>
+                <legend>Enviar Mensaje</legend>
+                <fieldset>
+                    <div class="pure-control-group">
+                        <input name="nom" id="destinatario" type="text" placeholder="Destinatario">
+                        <textarea name="contenido" type="text" placeholder="Ingrese su mensaje aqui" cols="30\" rows="10"></textarea>
+                    </div>
+
+                    <div class="pure-controls">
+                        <button type="submit" class="pure-button pure-button-primary">Enviar</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+
+        <div class="pure-u-1-3">
+           
+        </div>
+    </div>
+
+
+</html>
