@@ -167,7 +167,7 @@ public class Servidor {
 						}
 
 
-						ChatClient.enviar_mensaje(msg + "\n");
+						ChatClient.enviar_mensaje(msg);
 
 					}
 

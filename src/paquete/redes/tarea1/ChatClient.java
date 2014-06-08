@@ -25,20 +25,16 @@ public class ChatClient {
 	                              PrintWriter out, String Usuario) throws IOException {
 	    out.println("NICK " + Usuario);
 	    String serverResponse = in.readLine();
+	    System.out.print("RESPUESTA SERVIDOR getnick : "+serverResponse);
 	    if ("SERVER: OK".equals(serverResponse)) return Usuario;
 	    System.out.println(serverResponse);
 	    return getNick(in, out, Usuario);
 	}
 	
 	public static void enviar_mensaje(String msg){
-		System.out.print("ENVIANDO MENSAJE DE "+ nick + ": "+ msg);
+		System.out.print("ENVIANDO MENSAJE DE: "+ nick + ": "+ msg +"\n");
 		out.println("MSG "+ msg);
-		try {
-			System.out.print(in.readLine() +"\n");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
 	}
 	
 	public void iniciar_cliente (String Usuario) throws IOException {
