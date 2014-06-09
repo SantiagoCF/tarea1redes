@@ -16,11 +16,17 @@ public class ChatClient {
 	private static String nick=null;
 	private static PrintWriter out;
 	private static BufferedReader in;
+	
+	public static String obtenerNick(){
+		return nick;
+	}
 	/**
 	 * Read in a nickname from stdin and attempt to authenticate with the 
 	 * server by sending a NICK command to @out. If the response from @in
 	 * is not equal to "OK" go back and read a nickname again
 	 */
+	 
+	 
 	private static String getNick(BufferedReader in, 
 	                              PrintWriter out, String Usuario) throws IOException {
 	    out.println("NICK " + Usuario);

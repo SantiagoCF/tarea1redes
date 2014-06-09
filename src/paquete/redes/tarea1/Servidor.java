@@ -23,6 +23,7 @@ public class Servidor {
 	private int bytes;
 	private FileInputStream archivo = null;
 	private Boolean existe_temporal = false;
+	private Boolean existe_temporal_2 = false;
 
 	//variables para la conexion con servidor tcp/udp
 	private ChatClient chatClient;
@@ -172,7 +173,60 @@ public class Servidor {
 
 					if(objeto.equals("./chat.html")){
 						String msg = null;
+						
+						if(objeto.equals("./chat.html")){
+							
+							crear_archivo_cliente(chatClient.obtenerNick());
+							
+							//variables para la lectura del html "chat.html"
+							File original = null;
+							FileReader arch_original = null;
+							BufferedReader buffer = null;
+							String linea = new String();
 
+							//variables para escritura de html temporal
+							FileWriter temporal = null;
+							PrintWriter arch_temporal = null;
+
+							try {
+								//System.out.println("Entra al try");
+								//abre el html para lectura
+								original = new File(objeto);
+								arch_original = new FileReader(original);
+								buffer = new BufferedReader(arch_original);
+
+								//crea el html temporal para escritura
+								temporal = new FileWriter("temporal_2.html", true);
+								arch_temporal = new PrintWriter(temporal);
+
+								//Leemos el archivo y escribimos el html temporal con los datos cargados
+								while((linea = buffer.readLine()) != null){
+
+
+									//System.out.println(linea);
+									//copia la linea leida del html original								
+									arch_temporal.println(linea);
+
+									//si "linea" es igual a "<tbody>", escribe los datos de los contactos
+									if(linea.equals("                            function update(){")){
+										buffer.readLine();
+										arch_temporal.println("                            $( \"#mensajes\" ).load( \""+ chatClient.obtenerNick()+".txt\" );");
+									}								
+								}
+
+								//cierra los archivos
+								arch_original.close();
+								arch_temporal.close();
+
+								//reemplazamos el valor de la variable "objeto" por el archivo "temporal.html"
+								objeto = "./temporal_2.html";
+								existe_temporal_2 = true;
+
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+						
 						//si el archivo existe, envia los datos al cliente
 						if((archivo = new FileInputStream(objeto)) != null){
 
@@ -193,6 +247,13 @@ public class Servidor {
 						//cierra el socket
 						socket.close();
 						archivo.close();
+
+						//si se crea un temporal, se elimina
+						if(existe_temporal_2){
+
+							File temporal = new File("temporal_2.html"); 
+							temporal.delete(); 
+						}
 
 						//expresion regular para buscar los datos del nuevo contacto
 						Boolean encontrado = false;
@@ -269,7 +330,60 @@ public class Servidor {
 
 				//si el metodo es GET 
 				else{
+					
+					if(objeto.equals("./chat.html")){
+						
+						crear_archivo_cliente(chatClient.obtenerNick());
+						
+						//variables para la lectura del html "chat.html"
+						File original = null;
+						FileReader arch_original = null;
+						BufferedReader buffer = null;
+						String linea = new String();
 
+						//variables para escritura de html temporal
+						FileWriter temporal = null;
+						PrintWriter arch_temporal = null;
+
+						try {
+							//System.out.println("Entra al try");
+							//abre el html para lectura
+							original = new File(objeto);
+							arch_original = new FileReader(original);
+							buffer = new BufferedReader(arch_original);
+
+							//crea el html temporal para escritura
+							temporal = new FileWriter("temporal_2.html", true);
+							arch_temporal = new PrintWriter(temporal);
+
+							//Leemos el archivo y escribimos el html temporal con los datos cargados
+							while((linea = buffer.readLine()) != null){
+
+
+								//System.out.println(linea);
+								//copia la linea leida del html original								
+								arch_temporal.println(linea);
+
+								//si "linea" es igual a "<tbody>", escribe los datos de los contactos
+								if(linea.equals("                            function update(){")){
+									buffer.readLine();
+									arch_temporal.println("                            $( \"#mensajes\" ).load( \""+ chatClient.obtenerNick()+".txt\" );");
+								}								
+							}
+
+							//cierra los archivos
+							arch_original.close();
+							arch_temporal.close();
+
+							//reemplazamos el valor de la variable "objeto" por el archivo "temporal.html"
+							objeto = "./temporal_2.html";
+							existe_temporal_2 = true;
+
+						} catch (IOException e) {
+							e.printStackTrace();
+						}
+					}
+					
 					//si el el html es "ver_contacto.html"
 					if(objeto.equals("./ver_contacto.html")){
 
@@ -377,10 +491,16 @@ public class Servidor {
 					socket.close();
 					archivo.close();
 
-					//si se creó un temporal, se elimina
+					//si se crea un temporal, se elimina
 					if(existe_temporal){
 
 						File temporal = new File("temporal.html"); 
+						temporal.delete(); 
+					}
+					//si se crea un temporal_2, se elimina
+					if(existe_temporal_2){
+
+						File temporal = new File("temporal_2.html"); 
 						temporal.delete(); 
 					}
 				}
@@ -390,7 +510,27 @@ public class Servidor {
 			System.out.println("Error:" + e.getMessage());
 		}
 	}
+	
+	public void crear_archivo_cliente(String nick){
 
+		FileWriter archivo = null;
+		PrintWriter arch = null;
+
+		try {
+
+			//abre el archivo para escritura
+			archivo = new FileWriter(nick+".txt", true);
+			arch = new PrintWriter(archivo);
+
+			//cierra el archivo
+			arch.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+	}
+	
 	public void agregar_contacto(String contacto){
 
 		FileWriter archivo = null;
