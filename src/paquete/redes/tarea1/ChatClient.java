@@ -79,10 +79,38 @@ class ServerConn implements Runnable {
 	        /* loop reading messages from the server and show them 
 	         * on stdout */
 	        while ((msg = in.readLine()) != null) {
-	            System.out.println(msg);
+	        	String[] msg_parts = msg.split(" ", 3);
+	            if(msg_parts[0].equals("ENVIADO:")){
+	            	crear_archivo(msg_parts[1], msg_parts[2]);
+	            }
+	        	System.out.println(msg);
 	        }
 	    } catch (IOException e) {
 	        System.err.println(e);
 	    }
+	}
+	
+	public void crear_archivo(String destino, String msg){
+
+		FileWriter archivo = null;
+		PrintWriter arch = null;
+
+		try {
+
+			//abre el archivo para escritura
+			archivo = new FileWriter(destino+".txt", true);
+			arch = new PrintWriter(archivo);
+
+			//escribe un dato por linea
+			arch.println(msg);
+
+			//cierra el archivo
+			arch.close();
+			System.out.println("Archivo "+destino+".txt"+" = "+ msg);
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
 	}
 }
