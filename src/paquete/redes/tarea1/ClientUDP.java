@@ -12,7 +12,7 @@ import java.util.Arrays;
 public class ClientUDP {
 	static int serverPort;
 	static String filename;
-	    public static void main(String args[]) throws SocketException, IOException
+	    public void iniciar_udp(String archivo) throws SocketException, IOException
 	    {
 	        int count=0;
 	        int MAX_SIZE = 1024;
@@ -22,7 +22,7 @@ public class ClientUDP {
 
 	        byte[] sendData = new byte[MAX_SIZE];
 
-	        String filePath = "C:\\in.txt";
+	        String filePath = archivo;
 	        File file = new File(filePath);
 	        FileInputStream fis = new FileInputStream(file);
 

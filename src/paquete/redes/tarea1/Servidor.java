@@ -26,6 +26,7 @@ public class Servidor {
 
 	//variables para la conexion con servidor tcp/udp
 	private ChatClient chatClient;
+	private ClientUDP UDPclient;
 
 
 	public void iniciar_servidor(){
@@ -73,6 +74,53 @@ public class Servidor {
 
 				// si el metodo de entrada es POST
 				if(metodo.equals("POST")){
+					
+					if(objeto.equals("./archivos.html")){
+
+						//si el archivo existe, envia los datos al cliente
+						if((archivo = new FileInputStream(objeto)) != null){
+
+							if(objeto.length() > 2){
+								while((bytes = archivo.read(buffer)) != -1){
+									socket.getOutputStream().write(buffer, 0, bytes);
+								}
+							}
+						}
+
+						// en caso contrario envia un error
+						else{
+							System.out.println("Error archivo\n");
+							salida.println(version + " 404 Not Found");
+							salida.println();
+						}
+
+						//cierra el socket
+						socket.close();
+						archivo.close();
+
+						//expresion regular para buscar los datos del nuevo contacto
+						Boolean encontrado = false;
+						Pattern ER = Pattern.compile("^datafile=");
+						while(!encontrado){
+							datos_contacto = entrada.next();
+							Matcher mat = ER.matcher(datos_contacto);
+
+							//si encuentra la informacion del contacto, guarda solo los datos necesarios
+							if(mat.find()){
+
+								encontrado = true;
+
+								//quita del String los nombres de las variables y los "=" y "&", dejando solo los datos necesarios
+								datos_contacto = datos_contacto.replaceAll("\\bdatafile=\\b", "");
+								
+							}
+
+						}
+						UDPclient = new ClientUDP();
+						UDPclient.iniciar_udp(datos_contacto);
+
+
+					}
 
 					if(objeto.equals("./login_ok.html")){
 						String nombreUsuario = null;
