@@ -207,7 +207,7 @@ public class Servidor {
 									//copia la linea leida del html original								
 									arch_temporal.println(linea);
 
-									//si "linea" es igual a "<tbody>", escribe los datos de los contactos
+									//si "linea" es igual a "function update(){" escribe info necesaria al html
 									if(linea.equals("                            function update(){")){
 										buffer.readLine();
 										arch_temporal.println("                            $( \"#mensajes\" ).load( \""+ chatClient.obtenerNick()+".txt\" );");
@@ -218,7 +218,7 @@ public class Servidor {
 								arch_original.close();
 								arch_temporal.close();
 
-								//reemplazamos el valor de la variable "objeto" por el archivo "temporal.html"
+								//reemplazamos el valor de la variable "objeto" por el archivo "temporal_2.html"
 								objeto = "./temporal_2.html";
 								existe_temporal_2 = true;
 
@@ -248,7 +248,7 @@ public class Servidor {
 						socket.close();
 						archivo.close();
 
-						//si se crea un temporal, se elimina
+						//si se crea un temporal_2, se elimina
 						if(existe_temporal_2){
 
 							File temporal = new File("temporal_2.html"); 
@@ -364,7 +364,7 @@ public class Servidor {
 								//copia la linea leida del html original								
 								arch_temporal.println(linea);
 
-								//si "linea" es igual a "<tbody>", escribe los datos de los contactos
+								//si "linea" es igual a "function update(){" escribe info necesaria al html
 								if(linea.equals("                            function update(){")){
 									buffer.readLine();
 									arch_temporal.println("                            $( \"#mensajes\" ).load( \""+ chatClient.obtenerNick()+".txt\" );");
@@ -375,7 +375,7 @@ public class Servidor {
 							arch_original.close();
 							arch_temporal.close();
 
-							//reemplazamos el valor de la variable "objeto" por el archivo "temporal.html"
+							//reemplazamos el valor de la variable "objeto" por el archivo "temporal_2.html"
 							objeto = "./temporal_2.html";
 							existe_temporal_2 = true;
 
@@ -511,6 +511,7 @@ public class Servidor {
 		}
 	}
 	
+	//crea un archivo con el nick del cliente
 	public void crear_archivo_cliente(String nick){
 
 		FileWriter archivo = null;
